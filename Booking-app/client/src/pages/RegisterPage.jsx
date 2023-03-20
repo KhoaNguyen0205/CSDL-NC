@@ -24,13 +24,13 @@ export default function RegisterPage () {
             <div className="mb-64">
             <h1 className="text-4xl text-center mb-4">Register</h1>
             <form className="max-w-md mx-auto" onSubmit={registerUser}>  
-                <input type="text" placeholder="Your name" 
+                <input type="text" placeholder="Your name" required
                      value={name}
                      onChange={ev => setName(ev.target.value)} />                                                                            
-                <input type="email" placeholder="Your@email.com" 
+                <input type="email" placeholder="Your@email.com" required
                      value={email} 
                      onChange={ev => setEmail(ev.target.value)}/>
-                <input type="password" placeholder="password"
+                <input type="password" placeholder="password" required
                      value={password}
                      onChange={ev => setPassword(ev.target.value)} />
                 <button className="primary">Register</button>
