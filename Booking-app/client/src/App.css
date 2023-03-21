@@ -16,11 +16,11 @@
 }
 
 .menu-box{
-    border: 1px solid rgb(248, 248, 248);
+    border: 1px solid rgb(255, 255, 255);
     width: 30%;
     margin: 1%;
     padding: 1%;
-    float: left;
+    float: right;
 }
 
 .hotel-img{
@@ -39,8 +39,8 @@
 }
 
 h4{
-    color: blue;
-    text-align: justify;
+    color: rgb(14, 86, 194);
+    text-align: center;
     
 }
 
