@@ -1,0 +1,48 @@
+*{
+    margin:  0 0 ;
+    padding: 0 0;
+
+}
+
+.container{
+    width: 80%;
+    margin: 2% auto;
+    padding: 1%;
+}
+
+.hotel-menu{
+    background-color: rgb(255, 255, 255);
+    height: 10%;
+}
+
+.menu-box{
+    border: 1px solid white;
+    width: 23%;
+    margin: 1%;
+    padding: 1%;
+    float: left;
+}
+
+.hotel-img{
+    width: 60%;
+    float: left;
+}
+
+.img-responsive{
+    position: relative;
+    width: 100%;
+}
+
+.img-curve{
+    border-radius: 15px;
+}
+
+h4{
+    color: blue;
+    text-align: justify;
+    
+}
+
+.title-hotel{
+    width: 70%;
+}
