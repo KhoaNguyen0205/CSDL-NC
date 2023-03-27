@@ -8,7 +8,8 @@ const Place = require('./models/Place.js');
 const cookieParser = require('cookie-parser'); 
 const imageDownloader = require('image-downloader');
 const multer = require('multer')
-const fs = require('fs')
+const fs = require('fs');
+const exp = require('constants');
 
 require('dotenv').config();
 const app = express();
@@ -67,10 +68,10 @@ app.post('/login' , async (req , res) => {
   }
 });
 
-
 app.get('/profile', (req,res) => {
     const {token} = req.cookies;
     if(token) { 
+        console.log(token, "token")
         jwt.verify(token, jwtSecret, {}, async (err, userData) => {
             if(err) throw err;
            const {name,email,_id} = await User.findById(userData.id);
@@ -88,10 +89,10 @@ app.post('/logout', (req, res) => {
 console.log({__dirname});
 app.post('/upload-by-link' , async (req , res)=>{
   const {link} = req.body;
-  const newName = /*'photo'+*/ Date.now() + '.jpg';
+  const newName = Date.now() + '.jpg';
   await imageDownloader.image({
     url: link,
-    dest: __dirname + '/uploads' +newName,
+    dest: __dirname + '/uploads/' +newName,
   });
   res.json(newName);
 }) 
@@ -105,23 +106,22 @@ app.post('/upload', photosMiddleware.array('photos', 100),  (req,res) =>{
    const ext = parts[parts.length - 1];
    const newPath = path + '.' + ext;
    fs.renameSync(path, newPath);
-   uploadedFiles.push(newPath.replace('uploads/', ''));
+   uploadedFiles.push(newPath.replace('/uploads', ''));
 }
   res.json(uploadedFiles);
 });
 
-
 app.post('/places', (req,res) => {
     const {token} = req.cookies;
     const {
-        title,address,addPhots,description,
+        title,address,addedPhots,description,
         perks,extraInfo,checkIn,checkOut,maxGuests,
      } = req.body;
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if(err) throw err;
        const placeDoc =  await Place.create({
             owner: userData.id,
-            title,address,addPhots,description,
+            title,address,photos:addedPhots,description,
             perks,extraInfo,checkIn,checkOut,maxGuests,
         });
         res.json(placeDoc);
@@ -129,4 +129,38 @@ app.post('/places', (req,res) => {
    
 })
 
-app.listen(4000);  
+app.get('/places' , (req,res) => { 
+    const {token} = req.cookies; 
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        const {id} = userData;
+        res.json( await Place.find({owner:id}));
+    });
+
+});
+
+app.get('/places/:id', async (req,res) => {
+    const {id} = req.params;
+    res.json(await Place.findById(id))
+});
+
+
+app.put('/places', async (req,res) =>{
+    const {token} = req.cookies;
+    const {
+        id,title,address,addedPhots,description,
+        perks,extraInfo,checkIn,checkOut,maxGuests,
+    }= req.body;
+    jwt.verify(token, jwtSecret, {}, async (err, userData)=>{
+      const placeDoc = await Place.findById(id);
+      if(userData.id === placeDoc.owner.toString()){
+        placeDoc.set({
+            title,address,photos:addedPhots,description,
+            perks,extraInfo,checkIn,checkOut,maxGuests,
+        });
+        await placeDoc.save();
+        res.json('ok');
+      }
+    });
+});
+
+app.listen(4000);    
