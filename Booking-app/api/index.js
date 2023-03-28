@@ -97,10 +97,10 @@ app.post('/upload-by-link' , async (req , res)=>{
   res.json(newName);
 }) 
 
-const photosMiddleware = multer({dest:'uploads/'});
+const photosMiddleware = multer({dest:'./uploads/'});
 app.post('/upload', photosMiddleware.array('photos', 100),  (req,res) =>{
    const uploadedFiles = [];
-    for ( let i=0; i< req.files.length; i++){
+    for ( let i = 0 ; i < req.files.length; i++){
    const {path,originalname} = req.files[i]; 
    const parts = originalname.split('.');
    const ext = parts[parts.length - 1];
@@ -114,13 +114,13 @@ app.post('/upload', photosMiddleware.array('photos', 100),  (req,res) =>{
 app.post('/places', (req,res) => {
     const {token} = req.cookies;
     const {
-        title,address,addedPhots,description,
+        title,address,addedPhots,description,price,
         perks,extraInfo,checkIn,checkOut,maxGuests,
-     } = req.body;
+     } = req.body; 
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if(err) throw err;
-       const placeDoc =  await Place.create({
-            owner: userData.id,
+       const placeDoc =  await Place.create({      
+            owner: userData.id,price,
             title,address,photos:addedPhots,description,
             perks,extraInfo,checkIn,checkOut,maxGuests,
         });
@@ -129,7 +129,7 @@ app.post('/places', (req,res) => {
    
 })
 
-app.get('/places' , (req,res) => { 
+app.get('/user-places' , (req,res) => { 
     const {token} = req.cookies; 
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         const {id} = userData;
@@ -148,19 +148,23 @@ app.put('/places', async (req,res) =>{
     const {token} = req.cookies;
     const {
         id,title,address,addedPhots,description,
-        perks,extraInfo,checkIn,checkOut,maxGuests,
+        perks,extraInfo,checkIn,checkOut,maxGuests,price,
     }= req.body;
     jwt.verify(token, jwtSecret, {}, async (err, userData)=>{
       const placeDoc = await Place.findById(id);
       if(userData.id === placeDoc.owner.toString()){
         placeDoc.set({
             title,address,photos:addedPhots,description,
-            perks,extraInfo,checkIn,checkOut,maxGuests,
+            perks,extraInfo,checkIn,checkOut,maxGuests,price
         });
         await placeDoc.save();
         res.json('ok');
       }
     });
 });
+
+app.get('/places',async(req, res) => {
+  res.json(await Place.find())
+})
 
 app.listen(4000);    
